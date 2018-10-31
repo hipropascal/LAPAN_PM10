@@ -1,0 +1,9 @@
+=================== HTTP Link =======================
+
+https://ladsweb.modaps.eosdis.nasa.gov/archive/allData/61/MYD08_D3/2018/301/MYD08_D3.A2018301.061.2018302181012.hdf
+
+================== Opendap Link =====================
+
+https://ladsweb.modaps.eosdis.nasa.gov/opendap/allData/61/MYD08_D3/2018/contents.html
+
+https://ladsweb.modaps.eosdis.nasa.gov/opendap/allData/61/MYD08_D3/<year>/<day_month>/<file_name>.nc4?AOD_550_Dark_Target_Deep_Blue_Combined_Mean[0:1:179][0:1:359]
