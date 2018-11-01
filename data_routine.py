@@ -19,8 +19,8 @@ def download_file_aod(url,path):
 
 
 def download_aod():
-    from_year = 2004
-    to_year = 2018
+    from_year = 2018
+    to_year = 2019
 
     list_year = range(from_year, to_year)
     page = "https://ladsweb.modaps.eosdis.nasa.gov/opendap/allData/61/MYD08_D3/<year>/contents.html"
