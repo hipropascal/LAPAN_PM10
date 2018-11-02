@@ -52,8 +52,8 @@ body {
     position: absolute;
     background-color: #d0d0d0cc;
     color: white;
-    width: 450px;
-    border-right: 1px #006094 solid;
+    width: 360px;
+    border: 6px #0060949e solid;
     z-index: 10000;
     padding: 0px 14px 14px 15px;
     border-radius: 5px;
@@ -77,6 +77,8 @@ body {
     position: absolute;
     width: 100%;
     height: 100%;
+    z-index: 1000;
+    opacity: .6;
 }
 
 .menu-layer {
@@ -97,7 +99,7 @@ body {
 }
 
 #range-time {
-    width: 423px;
+    width: 332px;
     height: 30px;
     padding: 17px;
     margin: 10px 0px 1px 10px;
@@ -112,8 +114,8 @@ body {
     color: white;
 }
 
-#range-year {
-    width: 197px;
+#year {
+    width: 134px;
     height: 30px;
     padding: 17px;
     margin: 10px 0px 1px 10px;
@@ -123,11 +125,11 @@ body {
 
 }
 
-#range-month {
-    width: 197px;
+#month {
+    width: 183px;
     height: 30px;
     padding: 17px;
-    margin: 10px 0px 1px 10px;
+    margin: 9px 20px 2px 0px;
     font-size: 19px;
     border: none;
     border-radius: 0px;

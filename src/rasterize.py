@@ -19,7 +19,7 @@ def to_raster(dset, bound):
                                                                      int(binr[8:16], 2), \
                                                                      int(binr[16:24], 2), \
                                                                      255
-            if dset[i, j] == 0:
+            if dset[i, j] <= 0:
                 arr[i, j, 3] = 0
     img = Image.fromarray(arr, 'RGBA')
     # RASTER|minval|maxval|TOP|BOTTOM|LEFT|RIGHT

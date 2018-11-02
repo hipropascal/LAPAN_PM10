@@ -1,4 +1,5 @@
 from netCDF4 import Dataset, date2num, num2date
+from scipy.interpolate import interp2d
 from datetime import datetime
 import matplotlib.pyplot as plt
 import numpy as np
@@ -51,10 +52,11 @@ def compile_netcdf_daily():
     lat = rootgrp.createDimension("lat", len_lat)
     lon = rootgrp.createDimension("lon", len_lon)
     aod = rootgrp.createDimension("aod", None)
-    times = rootgrp.createVariable("time", "f8", ("time",))
-    latitudes = rootgrp.createVariable("lat", "f4", ("lat",))
-    longitudes = rootgrp.createVariable("lon", "f4", ("lon",))
-    aod_dat = rootgrp.createVariable("aod", "f4", ("time", "lat", "lon",), fill_value=0)
+    times = rootgrp.createVariable("time", "f8", ("time",), zlib=True)
+    latitudes = rootgrp.createVariable("lat", "f4", ("lat",), zlib=True)
+    longitudes = rootgrp.createVariable("lon", "f4", ("lon",), zlib=True)
+    aod_dat = rootgrp.createVariable("aod", "f4", ("time", "lat", "lon",), fill_value=-9999, zlib=True,
+                                     least_significant_digit=3)
     # aod_dat.units = "micron"
     latitudes.units = "degrees north"
     longitudes.units = "degrees east"
@@ -94,7 +96,8 @@ def compile_netcdf_monthly():
     times_monthly = monthly.createVariable("time", "f8", ("time",))
     latitudes_monthly = monthly.createVariable("lat", "f4", ("lat",))
     longitudes_monthly = monthly.createVariable("lon", "f4", ("lon",))
-    aod_dat_monthly = monthly.createVariable("aod", "f4", ("time", "lat", "lon",), fill_value=0)
+    aod_dat_monthly = monthly.createVariable("aod", "f4", ("time", "lat", "lon",), fill_value=-9999, zlib=True,
+                                             least_significant_digit=3)
     # aod_dat.units = "micron"
     latitudes_monthly.units = "degrees north"
     longitudes_monthly.units = "degrees east"
