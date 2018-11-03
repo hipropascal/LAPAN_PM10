@@ -9,7 +9,11 @@ map2.sync(map);
 map.sync(map2);
 
 var aod_gradient = [0, 1, 2, 3, 4, 5, 6];
-var rasterObj, image, cursor;
+var rasterObj, image, cursor, cursor2, dates;
+var cursorIcon = L.divIcon({
+    className: 'cursor-point',
+    html: '<div class="cursor"><div class="cursor-content"><div id="coor-val">0.0000</div><div id="timeseries">Detail</div></div></div>'
+});
 
 function byteString(n) {
     if (n < 0 || n > 255 || n % 1 !== 0) {
@@ -18,37 +22,72 @@ function byteString(n) {
     return ("000000000" + n.toString(2)).substr(-8)
 }
 
-
-$(function () {
-    $("#datepicker").datepicker();
-});
+function enableAllTheseDays(date) {
+    var sdate = $.datepicker.formatDate('mm/dd/yy', date);
+    if ($.inArray(sdate, dates) != -1) {
+        return [true];
+    }
+    return [false];
+}
 
 function initpage() {
-    select_range_time();
-    $('#range-time').change(function () {
+    // select last date
+    $.get('/dates_list', function (res) {
+        dates = res.dates;
+        var last_date = dates[dates.length - 1];
+        var last_date_p = last_date.split('/');
+        $('#year').val(last_date_p[2]);
+        $('#month').val(last_date_p[0]);
+        $("#datepicker").datepicker({
+            defaultDate: last_date,
+            beforeShowDay: enableAllTheseDays
+        });
         select_range_time();
+        $('#range-time').change(function () {
+            select_range_time();
+        });
+        $('#datepicker').change(function () {
+            select_range_time();
+            var time = $(this).val().split('/');
+            var dd = time[1];
+            var mm = time[0];
+            var yyyy = time[2];
+            $('#year').val(yyyy);
+            $('#month').val(mm);
+        });
+        $('#year').change(function () {
+            select_range_time();
+            var year = $(this).val();
+            var month = $('#month').val();
+            $("#datepicker").datepicker('setDate', month + '/01/' + year);
+        });
+        $('#month').change(function () {
+            select_range_time();
+            var year = $('#year').val();
+            var month = $(this).val();
+            $("#datepicker").datepicker('setDate', month + '/01/' + year);
+        });
     });
-    $('#datepicker').change(function () {
-        select_range_time();
-    });
-    $('#year').change(function () {
-        select_range_time();
-    });
-    $('#month').change(function () {
-        select_range_time();
-    });
+    $.get('/static/id.json', function (data) {
+        L.geoJSON(data, {style: {color: '#fff', weight: 1, fillOpacity: .02, opacity: .5}}).addTo(map2);
+    })
 }
 
 function select_range_time() {
+    try {
+        map2.removeLayer(cursor);
+        map2.removeLayer(cursor2);
+    } catch (e) {
+    }
     var data = $('#range-time').val();
     if (data === 'day') {
         $('.d').show();
         $('.m').hide();
-        setTimeout(load_raster_daily, 500);
+        setTimeout(load_raster_daily, 20);
     } else {
         $('.m').show();
         $('.d').hide();
-        setTimeout(load_raster_monthly, 500);
+        setTimeout(load_raster_monthly, 20);
     }
 }
 
@@ -158,7 +197,7 @@ function decodeImage(img, color, minmax) {
     // $(".legend-value-2").html((minmax[0] + minmax[1]) / 2);
     // $(".legend-value-3").html(minmax[1]);
     ctx.putImageData(im, 0, 0);
-    ctx.clearRect(0, 0, img.width, 5);
+    // ctx.clearRect(0, 0, img.width, 5);
     var strPng = canvas.toDataURL();
     var decodedImage = new Image;
     decodedImage.src = strPng;
@@ -175,10 +214,11 @@ function decodeImage(img, color, minmax) {
             bottom: bottom,
             left: left,
             right: right
-        }
+        },
+        magArr: magArr
     };
-
 }
+
 
 function getColorBar(color) {
     var pals = {
@@ -282,11 +322,35 @@ function doRaster() {
 
 map2.on('click', function (e) {
     try {
-        map2.removeLayer(cursor)
-    } catch (e) {}
+        map2.removeLayer(cursor);
+        map2.removeLayer(cursor2);
+    } catch (e) {
+    }
     var latlng = map2.mouseEventToLatLng(e.originalEvent);
+    var lat = latlng.lat;
+    var lng = latlng.lng;
+    var top = rasterObj.bounding.top;
+    var bottom = rasterObj.bounding.bottom;
+    var left = rasterObj.bounding.left;
+    var right = rasterObj.bounding.right;
+    var ratio_y = (lat - top) / (bottom - top);
+    var ratio_x = (lng - left) / (right - left);
+    var ypos = parseInt(rasterObj.height * ratio_y);
+    var xpos = parseInt(rasterObj.width * ratio_x);
+    console.log('ypos =' + ypos);
+    console.log('xpos =' + xpos);
+    var val = rasterObj.magArr[(ypos * (rasterObj.width)) + xpos];
+    val = Math.round(val * 1000) / 1000;
     console.log(latlng.lat + ', ' + latlng.lng);
-    cursor = L.marker([latlng.lat, latlng.lng]).addTo(map2);
+    cursor2 = L.popup()
+        .setLatLng(latlng)
+        .setContent('<p></p>')
+        .openOn(map2);
+    cursor = L.marker(latlng, {icon: cursorIcon}).addTo(map2);
+    if(val > 0)
+        $('#coor-val').html(val);
+    else
+        $('#coor-val').html('No Data');
 });
 
 initpage();

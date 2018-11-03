@@ -25,6 +25,15 @@ def main():
     return render_template('main.html')
 
 
+@app.route('/dates_list/')
+def dates_list():
+    date_str = []
+    for time in time_daily:
+        time_obj = num2date(time, units, calendar).strftime("%m/%d/%Y")
+        date_str.append(time_obj)
+    return jsonify({'dates': date_str})
+
+
 @app.route('/raster/daily/<time>')
 def req_raster_date(time):
     time_obj = datetime.strptime(time, '%d-%m-%Y')
@@ -47,10 +56,10 @@ def req_timeseries_daily(time_start, time_end, lat, lon):
     idx_time_end = find_nearest(time_daily, time_num_end)
     idx_lat = find_nearest(lats, float(lat))
     idx_lon = find_nearest(lons, float(lon))
-    datas = np.round(aod_daily[idx_time_start:idx_time_end, idx_lat, idx_lon].filled(),decimals=3)
+    datas = np.round(aod_daily[idx_time_start:idx_time_end, idx_lat, idx_lon].filled(), decimals=3)
     datas[datas < 0] = 0
     vecfmt = np.vectorize(stringify)
-    dates = num2date(time_daily[idx_time_start:idx_time_end],units,calendar)
+    dates = num2date(time_daily[idx_time_start:idx_time_end], units, calendar)
     dates_list = [datetime.strftime(date, '%Y%m%d') for date in dates]
     return jsonify({'time': dates_list, 'data': vecfmt(datas).tolist()})
 
@@ -77,10 +86,10 @@ def req_timeseries_monthly(time_start, time_end, lat, lon):
     idx_time_end = find_nearest(time_daily, time_num_end)
     idx_lat = find_nearest(lats, float(lat))
     idx_lon = find_nearest(lons, float(lon))
-    datas = np.round(aod_monthly[idx_time_start:idx_time_end, idx_lat, idx_lon].filled(),decimals=3)
+    datas = np.round(aod_monthly[idx_time_start:idx_time_end, idx_lat, idx_lon].filled(), decimals=3)
     datas[datas < 0] = 0
     vecfmt = np.vectorize(stringify)
-    dates = num2date(time_monthly[idx_time_start:idx_time_end],units,calendar)
+    dates = num2date(time_monthly[idx_time_start:idx_time_end], units, calendar)
     dates_list = [datetime.strftime(date, '%Y%m%d') for date in dates]
     return jsonify({'time': dates_list, 'data': vecfmt(datas).tolist()})
 
