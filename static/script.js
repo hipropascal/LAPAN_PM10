@@ -12,7 +12,7 @@ var aod_gradient = [0, 1, 2, 3, 4, 5, 6];
 var rasterObj, image, cursor, cursor2, dates;
 var cursorIcon = L.divIcon({
     className: 'cursor-point',
-    html: '<div class="cursor"><div class="cursor-content"><div id="coor-val">0.0000</div><div id="timeseries">Detail</div></div></div>'
+    html: '<div class="cursor"><div class="cursor-content"><div id="coor-val">0.0000</div><div id="timeseries">Grafik</div></div></div>'
 });
 
 function byteString(n) {
@@ -32,6 +32,7 @@ function enableAllTheseDays(date) {
 
 function initpage() {
     // select last date
+    $('.graph').hide();
     $.get('/dates_list', function (res) {
         dates = res.dates;
         var last_date = dates[dates.length - 1];
@@ -74,6 +75,7 @@ function initpage() {
 }
 
 function select_range_time() {
+    $('.graph').hide();
     try {
         map2.removeLayer(cursor);
         map2.removeLayer(cursor2);
@@ -96,6 +98,7 @@ function reload() {
 }
 
 function load_raster_daily() {
+
     var time = $('#datepicker').val().split('/');
     var dd = time[1];
     var mm = time[0];
@@ -346,11 +349,85 @@ map2.on('click', function (e) {
         .setLatLng(latlng)
         .setContent('<p></p>')
         .openOn(map2);
-    cursor = L.marker(latlng, {icon: cursorIcon}).addTo(map2);
-    if(val > 0)
+    cursor = L.marker(latlng, {icon: cursorIcon}).on('click', marker_on_click).addTo(map2);
+    if (val > 0)
         $('#coor-val').html(val);
     else
         $('#coor-val').html('No Data');
 });
+
+function marker_on_click(e) {
+    var data = $('#range-time').val();
+    var time = $('#datepicker').val().split('/');
+    var dd = time[1];
+    var mm = time[0];
+    var yyyy = time[2];
+    var year = $('#year').val();
+    var month = $('#month').val();
+    var timel = dates[dates.length - 1].split('/');
+    var ddl = timel[1];
+    var mml = timel[0];
+    var yyyyl = timel[2];
+    var str_time = [dd, mm, yyyy].join('-');
+    var str_timel = [ddl, mml, yyyyl].join('-');
+    var str_timem = ['01', month, year].join('-');
+    if (data === 'day') {
+        $.get('/timeseries/daily/' + str_time + '/' + str_timel + '/' + e.latlng.lat + '_' + e.latlng.lng, function (res) {
+            console.log(res);
+            var times = res.time;
+            var vals = res.data;
+            var graph_data = [];
+            var val;
+            for (var i = 0; i < times.length; i++) {
+                val = parseFloat(vals[i]);
+                if (isNaN(val)) {
+                    val = 0;
+                }
+                graph_data.push({'date': new Date(times[i]), 'value': val})
+            }
+            console.log(graph_data);
+            $('.graph').fadeIn();
+            MG.data_graphic({
+                data: graph_data,
+                width: $('.graph').width() - 20,
+                height: $('.graph').height() - 10,
+                target: '.graph',
+                x_accessor: 'date',
+                y_accessor: 'value',
+                top: 30,
+                bottom: 40,
+                y_extended_ticks: true,
+            });
+        });
+    } else {
+        $.get('/timeseries/monthly/' + str_timem + '/' + str_timel + '/' + e.latlng.lat + '_' + e.latlng.lng, function (res) {
+            console.log(res);
+            var times = res.time;
+            var vals = res.data;
+            var graph_data = [];
+            var val;
+            for (var i = 0; i < times.length; i++) {
+                val = parseFloat(vals[i]);
+                if (isNaN(val)) {
+                    val = 0;
+                }
+                graph_data.push({'date': new Date(times[i]), 'value': val})
+            }
+            console.log(graph_data);
+            $('.graph').fadeIn();
+            MG.data_graphic({
+                data: graph_data,
+                width: $('.graph').width() - 20,
+                height: $('.graph').height() - 10,
+                target: '.graph',
+                x_accessor: 'date',
+                y_accessor: 'value',
+                top: 30,
+                bottom: 40,
+                y_extended_ticks: true,
+            });
+        })
+    }
+}
 
 initpage();

@@ -56,11 +56,11 @@ def req_timeseries_daily(time_start, time_end, lat, lon):
     idx_time_end = find_nearest(time_daily, time_num_end)
     idx_lat = find_nearest(lats, float(lat))
     idx_lon = find_nearest(lons, float(lon))
-    datas = np.round(aod_daily[idx_time_start:idx_time_end, idx_lat, idx_lon].filled(), decimals=3)
+    datas = np.round(aod_daily[:, idx_lat, idx_lon].filled(), decimals=3)
     datas[datas < 0] = 0
     vecfmt = np.vectorize(stringify)
-    dates = num2date(time_daily[idx_time_start:idx_time_end], units, calendar)
-    dates_list = [datetime.strftime(date, '%Y%m%d') for date in dates]
+    dates = num2date(time_daily[:], units, calendar)
+    dates_list = [datetime.strftime(date, '%Y-%m-%d') for date in dates]
     return jsonify({'time': dates_list, 'data': vecfmt(datas).tolist()})
 
 
@@ -82,15 +82,15 @@ def req_timeseries_monthly(time_start, time_end, lat, lon):
     time_obj_end = datetime.strptime(time_end, '%d-%m-%Y')
     time_num_start = date2num(time_obj_start, units, calendar)
     time_num_end = date2num(time_obj_end, units, calendar)
-    idx_time_start = find_nearest(time_daily, time_num_start)
-    idx_time_end = find_nearest(time_daily, time_num_end)
+    idx_time_start = find_nearest(time_monthly, time_num_start)
+    idx_time_end = find_nearest(time_monthly, time_num_end)
     idx_lat = find_nearest(lats, float(lat))
     idx_lon = find_nearest(lons, float(lon))
-    datas = np.round(aod_monthly[idx_time_start:idx_time_end, idx_lat, idx_lon].filled(), decimals=3)
+    datas = np.round(aod_monthly[:, idx_lat, idx_lon].filled(), decimals=3)
     datas[datas < 0] = 0
     vecfmt = np.vectorize(stringify)
-    dates = num2date(time_monthly[idx_time_start:idx_time_end], units, calendar)
-    dates_list = [datetime.strftime(date, '%Y%m%d') for date in dates]
+    dates = num2date(time_monthly[:], units, calendar)
+    dates_list = [datetime.strftime(date, '%Y-%m-%d') for date in dates]
     return jsonify({'time': dates_list, 'data': vecfmt(datas).tolist()})
 
 

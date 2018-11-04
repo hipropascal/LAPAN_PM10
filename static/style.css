@@ -16,7 +16,7 @@ body {
 }
 
 .header {
-    height: 99px;
+    height: 60px;
     display: flex;
     flex-direction: row;
     border-bottom: solid #0082ce 5px;
@@ -52,13 +52,13 @@ body {
     position: absolute;
     background-color: #d0d0d0cc;
     color: white;
-    width: 360px;
+    width: 300px;
     border: 3px #0060949e solid;
     z-index: 4;
-    padding: 0px 14px 14px 15px;
     border-radius: 5px;
     top: 11px;
     left: 55px;
+    padding-bottom: 16px;
 }
 
 #map {
@@ -107,10 +107,12 @@ body {
     height: 100%;
 }
 
-.footer {
-    height: 15px;
-    color: white;
-    background-color: #004d83;
+.graph {
+    background-color: #ffffffb0;
+    position: absolute;
+    height: 210px;
+    width: 100%;
+    bottom: 0;
     z-index: 10000;
     -webkit-box-shadow: 0px -2px 1px 0px rgba(0, 0, 0, 0.35);
     -moz-box-shadow: 0px -2px 1px 0px rgba(0, 0, 0, 0.35);
@@ -118,7 +120,7 @@ body {
 }
 
 #range-time {
-    width: 332px;
+    width: 278px;
     padding: 5px;
     margin: 10px 0px 1px 10px;
     font-size: 17px;
@@ -132,7 +134,7 @@ body {
 }
 
 #year {
-    width: 134px;
+    width: 84px;
     padding: 5px;
     margin: 10px 0px 1px 10px;
     font-size: 17px;
@@ -198,9 +200,8 @@ body {
     display: block;
     text-align: right;
     text-decoration: none;
-    height: 22px;
+    height: 20px;
     font-size: 14px;
-    padding: 11px 15px 4px 0px;
 }
 
 .menu-content .ui-datepicker .ui-datepicker-title {
